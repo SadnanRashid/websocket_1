@@ -12,14 +12,26 @@
     ></script>
   </head>
   <body>
-    <h1>Chat app</h1>
+    <!-- <h1>Chat app</h1>
     <input type="text" name="" id="message" />
     <button id="inputBtn">Send</button>
-    <h3 id="receivedMSG"></h3>
+    <h3 id="receivedMSG"></h3> -->
 
-    <script>
+    <p>Host: <b id="host"></b></p>
+    <p>Connection: <b id="connection">Connecting...</b></p>
+    <p>User: <b id="userId"></b></p>
+
+    <hr />
+
+    <div>
+      <h1>Logs</h1>
+      <div id="logs"></div>
+    </div>
+
+    <!-- <script>
       const socket = io("http://localhost:3000");
       socket.on("connection", () => console.log(socket));
-    </script>
+    </script> -->
+    <script src="./script.js"></script>
   </body>
 </html>

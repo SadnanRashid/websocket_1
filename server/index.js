@@ -1,12 +1,58 @@
+// const express = require("express");
+// const app = express();
+// const server = require("http").createServer(app);
+// const io = require("socket.io")(server, { cors: { origin: "*" } });
+
+// server.listen("3000", () => {
+//   console.log("server is running");
+// });
+
+// io.on("connection", (socket) => {
+//   console.log("client joined: ", socket.id);
+// });
+//
+//
+//
+//
+
+const _ = require("lodash");
 const express = require("express");
 const app = express();
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, { cors: { origin: "*" } });
-
-server.listen("3000", () => {
-  console.log("server is running");
+const port = 3000; // define your port
+const server = app.listen(port, () => {
+  console.log(`We are Listening on port ${port}...`);
 });
 
+const io = require("socket.io")(server, {
+  path: "/pathToConnection",
+});
+let users = {};
 io.on("connection", (socket) => {
-  console.log("client joined: ", socket.id);
+  let userId = socket.handshake.query.userId; // GET USER ID
+
+  // CHECK IS USER EXHIST
+  if (!users[userId]) users[userId] = [];
+
+  // PUSH SOCKET ID FOR PARTICULAR USER ID
+  users[userId].push(socket.id);
+
+  // USER IS ONLINE BROAD CAST TO ALL CONNECTED USERS
+  io.sockets.emit("online", userId);
+  console.log(userId, "Is Online!", socket.id);
+
+  // DISCONNECT EVENT
+  socket.on("disconnect", (reason) => {
+    // REMOVE FROM SOCKET USERS
+    _.remove(users[userId], (u) => u === socket.id);
+    if (users[userId].length === 0) {
+      // ISER IS OFFLINE BROAD CAST TO ALL CONNECTED USERS
+      io.sockets.emit("offline", userId);
+      // REMOVE OBJECT
+      delete users[userId];
+    }
+
+    socket.disconnect(); // DISCONNECT SOCKET
+
+    console.log(userId, "Is Offline!", socket.id);
+  });
 });
